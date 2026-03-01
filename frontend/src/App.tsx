@@ -99,7 +99,7 @@ function App() {
       <div className="app-container">
         <div className="left-column">
           <RiskMeter riskScore={riskScore} />
-          <ActionButtons onAction={handleAction} disabled={loading} />
+          <ActionButtons onAction={handleAction} disabled={loading} currentRiskScore={riskScore} />
           <ActivityMetricsDisplay metrics={activityMetrics} />
         </div>
 

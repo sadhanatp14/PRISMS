@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link, Lock, Wifi, Shield, History } from 'lucide-react';
 import { ActionHistoryItem } from '../types';
 import './Timeline.css';
 
@@ -24,18 +25,18 @@ const Timeline: React.FC<TimelineProps> = ({ history }) => {
   };
 
   const getActionIcon = (actionType: string) => {
-    const icons: { [key: string]: string } = {
-      suspicious_link: '🔗',
-      weak_password: '🔓',
-      public_wifi: '📶',
-      excessive_permissions: '⚠️'
+    const icons: { [key: string]: React.ReactNode } = {
+      suspicious_link: <Link size={20} />,
+      weak_password: <Lock size={20} />,
+      public_wifi: <Wifi size={20} />,
+      excessive_permissions: <Shield size={20} />
     };
-    return icons[actionType] || '⚠️';
+    return icons[actionType] || <Shield size={20} />;
   };
 
   return (
     <div className="timeline">
-      <h2>Action History</h2>
+      <h2><History size={24} /> Action History</h2>
       {history.length === 0 ? (
         <div className="timeline-empty">
           No risky actions performed yet. Start by clicking one of the action buttons above.

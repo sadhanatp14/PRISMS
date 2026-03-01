@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Mouse, BarChart3, Keyboard, Clock, Activity, Lightbulb } from 'lucide-react';
 import { ActivityMetrics } from '../types';
 import './ActivityMetrics.css';
 
@@ -23,29 +24,37 @@ const ActivityMetricsDisplay: React.FC<ActivityMetricsProps> = ({ metrics }) => 
 
   return (
     <div className="activity-metrics">
-      <h2>📊 Real-Time Activity Tracking</h2>
+      <h2><BarChart3 size={24} /> Real-Time Activity Tracking</h2>
       
       <div className="metrics-grid">
         <div className="metric-card">
-          <div className="metric-icon">🖱️</div>
+          <div className="metric-icon">
+            <Mouse size={28} />
+          </div>
           <div className="metric-label">Clicks</div>
           <div className="metric-value">{metrics.totalClicks}</div>
         </div>
 
         <div className="metric-card">
-          <div className="metric-icon">⬆️⬇️</div>
+          <div className="metric-icon">
+            <BarChart3 size={28} />
+          </div>
           <div className="metric-label">Scrolls</div>
           <div className="metric-value">{metrics.totalScrollEvents}</div>
         </div>
 
         <div className="metric-card">
-          <div className="metric-icon">⌨️</div>
+          <div className="metric-icon">
+            <Keyboard size={28} />
+          </div>
           <div className="metric-label">Key Presses</div>
           <div className="metric-value">{metrics.totalKeyPresses}</div>
         </div>
 
         <div className="metric-card">
-          <div className="metric-icon">🕐</div>
+          <div className="metric-icon">
+            <Clock size={28} />
+          </div>
           <div className="metric-label">Time on Page</div>
           <div className="metric-value">{displayTime}</div>
         </div>
@@ -53,7 +62,8 @@ const ActivityMetricsDisplay: React.FC<ActivityMetricsProps> = ({ metrics }) => 
 
       <div className="activity-status">
         <div className={`status-indicator ${metrics.isActiveNow ? 'active' : 'inactive'}`}>
-          {metrics.isActiveNow ? '● Active' : '○ Inactive'}
+          <Activity size={16} />
+          {metrics.isActiveNow ? 'Active' : 'Inactive'}
         </div>
         <div className="last-activity">
           Last activity: {new Date(metrics.lastActivityTime).toLocaleTimeString()}
@@ -63,7 +73,7 @@ const ActivityMetricsDisplay: React.FC<ActivityMetricsProps> = ({ metrics }) => 
       <div className={`activity-risk-box ${getActivityRiskColor()}`}>
         <span className="activity-risk-label">Activity Risk Score</span>
         <span className="activity-risk-value">{metrics.riskScore}/30</span>
-        <div className="activity-risk-bar">
+        <div className="activity-risk<Lightbulb size={18} />ar">
           <div 
             className="activity-risk-fill"
             style={{ width: `${(metrics.riskScore / 30) * 100}%` }}

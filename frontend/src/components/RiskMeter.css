@@ -12,12 +12,21 @@
   color: #1f2937;
   font-size: 1.3rem;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .meter-container {
   display: flex;
   justify-content: center;
   margin: 30px 0;
+}
+
+.risk-icon {
+  margin-bottom: 10px;
+  opacity: 0.9;
 }
 
 .meter-circle {

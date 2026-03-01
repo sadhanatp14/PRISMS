@@ -1,4 +1,5 @@
 import React from 'react';
+import { HelpCircle, AlertTriangle, CheckCircle2, Shield } from 'lucide-react';
 import { LastAction } from '../types';
 import './ExplainabilityPanel.css';
 
@@ -17,7 +18,7 @@ const ExplainabilityPanel: React.FC<ExplainabilityPanelProps> = ({ lastAction })
   if (!lastAction) {
     return (
       <div className="explainability-panel">
-        <h2>🛡️ Risk Explanation</h2>
+        <h2><Shield size={24} /> Risk Explanation</h2>
         <div className="explainability-empty">
           Perform a risky action to see detailed explanations and safer alternatives.
         </div>
@@ -27,14 +28,14 @@ const ExplainabilityPanel: React.FC<ExplainabilityPanelProps> = ({ lastAction })
 
   return (
     <div className="explainability-panel">
-      <h2>🛡️ Risk Explanation</h2>
+      <h2><Shield size={24} /> Risk Explanation</h2>
       <div className="explanation-action-title">
         Last Action: <span>{formatActionType(lastAction.action_type)}</span>
       </div>
       
       <div className="explanation-section">
         <div className="explanation-label">
-          <span className="explanation-icon">❓</span>
+          <HelpCircle size={20} />
           Why is this risky?
         </div>
         <div className="explanation-text">
@@ -44,7 +45,7 @@ const ExplainabilityPanel: React.FC<ExplainabilityPanelProps> = ({ lastAction })
 
       <div className="explanation-section">
         <div className="explanation-label">
-          <span className="explanation-icon">⚠️</span>
+          <AlertTriangle size={20} />
           What could happen?
         </div>
         <div className="explanation-text consequence">
@@ -54,7 +55,7 @@ const ExplainabilityPanel: React.FC<ExplainabilityPanelProps> = ({ lastAction })
 
       <div className="explanation-section">
         <div className="explanation-label">
-          <span className="explanation-icon">✅</span>
+          <CheckCircle2 size={20} />
           Safer alternative
         </div>
         <div className="explanation-text alternative">

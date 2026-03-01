@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { RotateCcw } from 'lucide-react';
 import RiskMeter from './components/RiskMeter';
 import ActionButtons from './components/ActionButtons';
 import Timeline from './components/Timeline';
@@ -86,11 +87,12 @@ function App() {
     <div className="app">
       <header className="app-header">
         <div className="header-content">
-          <h1 className="app-title">� CyberMirror</h1>
+          <h1 className="app-title">CyberMirror</h1>
           <p className="subtitle">Real-Time Cybersecurity & Privacy Risk Awareness</p>
         </div>
         <button className="reset-button" onClick={handleReset}>
-          ↻ Reset Session
+          <RotateCcw size={18} />
+          Reset Session
         </button>
       </header>
 

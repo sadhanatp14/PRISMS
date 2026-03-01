@@ -15,28 +15,32 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Risk scoring rules
+# Risk scoring rules with categories
 RISK_RULES = {
     "suspicious_link": {
         "risk_points": 30,
+        "category": "Account Security",
         "explanation": "Clicking suspicious links can lead to phishing attacks where attackers steal your credentials or install malware on your device.",
         "predicted_consequence": "Your personal data, passwords, or financial information could be stolen. Malware could be installed on your device.",
         "safer_alternative": "Hover over links to check the URL before clicking. Use a link checker tool. Only click links from trusted sources."
     },
     "weak_password": {
         "risk_points": 25,
+        "category": "Account Security",
         "explanation": "Weak passwords are easy for attackers to guess or crack using automated tools, giving them access to your accounts.",
         "predicted_consequence": "Your accounts could be hacked, leading to identity theft, data breaches, or unauthorized access to your personal information.",
         "safer_alternative": "Use strong passwords with 12+ characters including uppercase, lowercase, numbers, and symbols. Use a password manager to generate and store unique passwords."
     },
     "public_wifi": {
         "risk_points": 20,
+        "category": "Network Security",
         "explanation": "Public Wi-Fi networks are often unsecured, allowing attackers to intercept your data and monitor your online activities.",
         "predicted_consequence": "Attackers can steal your passwords, banking details, and personal messages. They could perform man-in-the-middle attacks.",
         "safer_alternative": "Use a VPN when connecting to public Wi-Fi. Avoid accessing sensitive accounts. Use your mobile hotspot instead."
     },
     "excessive_permissions": {
         "risk_points": 15,
+        "category": "Privacy",
         "explanation": "Granting excessive app permissions gives apps access to your personal data, location, contacts, and other sensitive information they don't need.",
         "predicted_consequence": "Apps could misuse your data, sell it to third parties, or expose it in a data breach. Your privacy is compromised.",
         "safer_alternative": "Only grant permissions that are essential for the app's core functionality. Review and revoke unnecessary permissions regularly in your device settings."
@@ -49,6 +53,11 @@ class AppState:
         self.risk_score = 0
         self.action_history: List[Dict] = []
         self.session_start_time = datetime.now()
+        self.risk_breakdown = {
+            "Account Security": 0,
+            "Network Security": 0,
+            "Privacy": 0
+        }
     
     def add_action(self, action_type: str):
         if action_type in RISK_RULES:
@@ -57,11 +66,17 @@ class AppState:
             # Update risk score (cap at 100)
             self.risk_score = min(100, self.risk_score + rule["risk_points"])
             
+            # Update risk breakdown
+            category = rule.get("category", "Other")
+            if category in self.risk_breakdown:
+                self.risk_breakdown[category] += rule["risk_points"]
+            
             # Add to history
             action_entry = {
                 "action_type": action_type,
                 "timestamp": datetime.now().isoformat(),
                 "risk_points": rule["risk_points"],
+                "category": category,
                 "explanation": rule["explanation"]
             }
             self.action_history.append(action_entry)
@@ -176,12 +191,43 @@ async def get_hygiene_score():
     """Calculate and return the weekly digital hygiene score"""
     return state.calculate_hygiene_score()
 
+@app.get("/risk-breakdown")
+async def get_risk_breakdown():
+    """Get the breakdown of risk by category"""
+    total_risk = sum(state.risk_breakdown.values())
+    breakdown_percentages = {}
+    
+    for category, risk_points in state.risk_breakdown.items():
+        if total_risk > 0:
+            percentage = (risk_points / total_risk) * 100
+        else:
+            percentage = 0
+        
+        breakdown_percentages[category] = {
+            "risk_points": risk_points,
+            "percentage": round(percentage, 1)
+        }
+    
+    # Determine weakest area
+    weakest_area = max(state.risk_breakdown, key=state.risk_breakdown.get) if state.risk_breakdown else None
+    
+    return {
+        "breakdown": breakdown_percentages,
+        "total_risk": total_risk,
+        "weakest_area": weakest_area
+    }
+
 @app.post("/reset")
 async def reset_state():
     """Reset the risk score and action history"""
     state.risk_score = 0
     state.action_history = []
     state.session_start_time = datetime.now()
+    state.risk_breakdown = {
+        "Account Security": 0,
+        "Network Security": 0,
+        "Privacy": 0
+    }
     return {
         "success": True,
         "message": "State reset successfully",

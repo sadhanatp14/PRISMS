@@ -6,7 +6,8 @@ import Timeline from './components/Timeline';
 import ExplainabilityPanel from './components/ExplainabilityPanel';
 import ActivityMetricsDisplay from './components/ActivityMetrics';
 import HygieneScore from './components/HygieneScore';
-import { api, HygieneScoreResponse } from './api';
+import RiskBreakdown from './components/RiskBreakdown';
+import { api, HygieneScoreResponse, RiskBreakdownResponse } from './api';
 import { ActionType, ActionHistoryItem, LastAction, ActivityMetrics } from './types';
 import activityTracker from './activityTracker';
 import './App.css';
@@ -23,11 +24,13 @@ function App() {
     activityTracker.getMetrics()
   );
   const [hygieneScore, setHygieneScore] = useState<HygieneScoreResponse | null>(null);
+  const [riskBreakdown, setRiskBreakdown] = useState<RiskBreakdownResponse | null>(null);
 
   // Load initial state
   useEffect(() => {
     loadState();
     loadHygieneScore();
+    loadRiskBreakdown();
   }, []);
 
   // Update activity metrics in real-time
@@ -58,6 +61,15 @@ function App() {
     }
   };
 
+  const loadRiskBreakdown = async () => {
+    try {
+      const breakdown = await api.getRiskBreakdown();
+      setRiskBreakdown(breakdown);
+    } catch (error) {
+      console.error('Failed to load risk breakdown:', error);
+    }
+  };
+
   const handleAction = async (actionType: ActionType) => {
     setLoading(true);
     try {
@@ -75,6 +87,7 @@ function App() {
         // Reload state to get updated history
         await loadState();
         await loadHygieneScore();
+        await loadRiskBreakdown();
       }
     } catch (error) {
       console.error('Failed to perform action:', error);
@@ -94,6 +107,7 @@ function App() {
         activityTracker.resetTracker();
         setActivityMetrics(activityTracker.getMetrics());
         await loadHygieneScore();
+        await loadRiskBreakdown();
       } catch (error) {
         console.error('Failed to reset state:', error);
       }
@@ -148,6 +162,7 @@ function App() {
 
             <div className="right-column">
               <ExplainabilityPanel lastAction={lastAction} />
+              {riskBreakdown && <RiskBreakdown data={riskBreakdown} />}
               <Timeline history={actionHistory} />
             </div>
           </div>

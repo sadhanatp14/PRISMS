@@ -13,6 +13,17 @@ export interface HygieneScoreResponse {
   total_risk_accumulated: number;
 }
 
+export interface RiskBreakdownResponse {
+  breakdown: {
+    [key: string]: {
+      risk_points: number;
+      percentage: number;
+    };
+  };
+  total_risk: number;
+  weakest_area: string | null;
+}
+
 export const api = {
   async performAction(actionType: ActionType): Promise<ActionResponse> {
     const response = await axios.post<ActionResponse>(`${API_BASE_URL}/action`, {
@@ -28,6 +39,11 @@ export const api = {
 
   async getHygieneScore(): Promise<HygieneScoreResponse> {
     const response = await axios.get<HygieneScoreResponse>(`${API_BASE_URL}/hygiene-score`);
+    return response.data;
+  },
+
+  async getRiskBreakdown(): Promise<RiskBreakdownResponse> {
+    const response = await axios.get<RiskBreakdownResponse>(`${API_BASE_URL}/risk-breakdown`);
     return response.data;
   },
 

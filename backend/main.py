@@ -149,6 +149,118 @@ class AppState:
             "recommendation": recommendation,
             "total_risk_accumulated": total_risk_accumulated
         }
+    
+    def generate_personalized_tips(self) -> List[Dict]:
+        """Generate personalized safety tips based on behavior patterns"""
+        tips = []
+        
+        if not self.action_history:
+            return [{
+                "tip": "Great start! Keep learning about digital safety.",
+                "category": "General",
+                "urgency": "low"
+            }]
+        
+        # Count action occurrences
+        action_counts = {}
+        for action in self.action_history:
+            action_type = action["action_type"]
+            action_counts[action_type] = action_counts.get(action_type, 0) + 1
+        
+        # Personalized tips based on repeated patterns
+        tip_templates = {
+            "suspicious_link": {
+                "single": {
+                    "tip": "Always hover over links to preview the URL before clicking.",
+                    "category": "Account Security",
+                    "urgency": "medium"
+                },
+                "multiple": {
+                    "tip": "You often click suspicious links. Consider enabling link previews or using a URL checker like VirusTotal.",
+                    "category": "Account Security",
+                    "urgency": "high"
+                }
+            },
+            "weak_password": {
+                "single": {
+                    "tip": "Strong passwords should have 12+ characters with mixed cases, numbers, and symbols.",
+                    "category": "Account Security",
+                    "urgency": "medium"
+                },
+                "multiple": {
+                    "tip": "You repeatedly use weak passwords. Install a password manager like Bitwarden or 1Password to generate and store secure passwords.",
+                    "category": "Account Security",
+                    "urgency": "high"
+                }
+            },
+            "public_wifi": {
+                "single": {
+                    "tip": "Public Wi-Fi is risky. Use a VPN to encrypt your connection.",
+                    "category": "Network Security",
+                    "urgency": "medium"
+                },
+                "multiple": {
+                    "tip": "You frequently connect to public Wi-Fi. Install a VPN like ProtonVPN or Mullvad, and avoid accessing sensitive accounts on public networks.",
+                    "category": "Network Security",
+                    "urgency": "high"
+                }
+            },
+            "excessive_permissions": {
+                "single": {
+                    "tip": "Review app permissions and only grant what's necessary for the app to function.",
+                    "category": "Privacy",
+                    "urgency": "medium"
+                },
+                "multiple": {
+                    "tip": "You often grant excessive permissions. Go to Settings → Privacy and review all app permissions. Revoke unnecessary access.",
+                    "category": "Privacy",
+                    "urgency": "high"
+                }
+            }
+        }
+        
+        # Generate tips based on patterns
+        for action_type, count in action_counts.items():
+            if action_type in tip_templates:
+                template = tip_templates[action_type]
+                if count >= 3:
+                    tips.append(template["multiple"])
+                elif count >= 1:
+                    tips.append(template["single"])
+        
+        # Add category-specific tips if user is weak in an area
+        max_category_risk = max(self.risk_breakdown.values()) if self.risk_breakdown else 0
+        if max_category_risk > 40:
+            weakest_category = max(self.risk_breakdown, key=self.risk_breakdown.get)
+            category_tips = {
+                "Account Security": {
+                    "tip": "Enable two-factor authentication (2FA) on all important accounts for extra security.",
+                    "category": "Account Security",
+                    "urgency": "high"
+                },
+                "Network Security": {
+                    "tip": "Create a mobile hotspot instead of using public Wi-Fi when possible.",
+                    "category": "Network Security",
+                    "urgency": "high"
+                },
+                "Privacy": {
+                    "tip": "Use privacy-focused browsers like Brave or Firefox with privacy extensions.",
+                    "category": "Privacy",
+                    "urgency": "high"
+                }
+            }
+            if weakest_category in category_tips:
+                tips.append(category_tips[weakest_category])
+        
+        # If no specific tips, give general advice
+        if not tips:
+            tips.append({
+                "tip": "Stay vigilant! Always think before clicking links or sharing personal information.",
+                "category": "General",
+                "urgency": "low"
+            })
+        
+        return tips
 
 state = AppState()
 
@@ -215,6 +327,13 @@ async def get_risk_breakdown():
         "breakdown": breakdown_percentages,
         "total_risk": total_risk,
         "weakest_area": weakest_area
+    }
+
+@app.get("/personalized-tips")
+async def get_personalized_tips():
+    """Get personalized safety tips based on behavior patterns"""
+    return {
+        "tips": state.generate_personalized_tips()
     }
 
 @app.post("/reset")

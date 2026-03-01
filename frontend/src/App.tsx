@@ -7,7 +7,8 @@ import ExplainabilityPanel from './components/ExplainabilityPanel';
 import ActivityMetricsDisplay from './components/ActivityMetrics';
 import HygieneScore from './components/HygieneScore';
 import RiskBreakdown from './components/RiskBreakdown';
-import { api, HygieneScoreResponse, RiskBreakdownResponse } from './api';
+import PersonalizedTips from './components/PersonalizedTips';
+import { api, HygieneScoreResponse, RiskBreakdownResponse, PersonalizedTipsResponse } from './api';
 import { ActionType, ActionHistoryItem, LastAction, ActivityMetrics } from './types';
 import activityTracker from './activityTracker';
 import './App.css';
@@ -25,12 +26,14 @@ function App() {
   );
   const [hygieneScore, setHygieneScore] = useState<HygieneScoreResponse | null>(null);
   const [riskBreakdown, setRiskBreakdown] = useState<RiskBreakdownResponse | null>(null);
+  const [personalizedTips, setPersonalizedTips] = useState<PersonalizedTipsResponse | null>(null);
 
   // Load initial state
   useEffect(() => {
     loadState();
     loadHygieneScore();
     loadRiskBreakdown();
+    loadPersonalizedTips();
   }, []);
 
   // Update activity metrics in real-time
@@ -70,6 +73,15 @@ function App() {
     }
   };
 
+  const loadPersonalizedTips = async () => {
+    try {
+      const tips = await api.getPersonalizedTips();
+      setPersonalizedTips(tips);
+    } catch (error) {
+      console.error('Failed to load personalized tips:', error);
+    }
+  };
+
   const handleAction = async (actionType: ActionType) => {
     setLoading(true);
     try {
@@ -88,6 +100,7 @@ function App() {
         await loadState();
         await loadHygieneScore();
         await loadRiskBreakdown();
+        await loadPersonalizedTips();
       }
     } catch (error) {
       console.error('Failed to perform action:', error);
@@ -108,6 +121,7 @@ function App() {
         setActivityMetrics(activityTracker.getMetrics());
         await loadHygieneScore();
         await loadRiskBreakdown();
+        await loadPersonalizedTips();
       } catch (error) {
         console.error('Failed to reset state:', error);
       }
@@ -162,6 +176,7 @@ function App() {
 
             <div className="right-column">
               <ExplainabilityPanel lastAction={lastAction} />
+              {personalizedTips && <PersonalizedTips tips={personalizedTips.tips} />}
               {riskBreakdown && <RiskBreakdown data={riskBreakdown} />}
               <Timeline history={actionHistory} />
             </div>

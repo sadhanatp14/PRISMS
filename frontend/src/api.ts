@@ -24,6 +24,16 @@ export interface RiskBreakdownResponse {
   weakest_area: string | null;
 }
 
+export interface PersonalizedTip {
+  tip: string;
+  category: string;
+  urgency: string;
+}
+
+export interface PersonalizedTipsResponse {
+  tips: PersonalizedTip[];
+}
+
 export const api = {
   async performAction(actionType: ActionType): Promise<ActionResponse> {
     const response = await axios.post<ActionResponse>(`${API_BASE_URL}/action`, {
@@ -44,6 +54,11 @@ export const api = {
 
   async getRiskBreakdown(): Promise<RiskBreakdownResponse> {
     const response = await axios.get<RiskBreakdownResponse>(`${API_BASE_URL}/risk-breakdown`);
+    return response.data;
+  },
+
+  async getPersonalizedTips(): Promise<PersonalizedTipsResponse> {
+    const response = await axios.get<PersonalizedTipsResponse>(`${API_BASE_URL}/personalized-tips`);
     return response.data;
   },
 

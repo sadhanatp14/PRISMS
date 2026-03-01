@@ -100,10 +100,10 @@ function App() {
         <div className="left-column">
           <RiskMeter riskScore={riskScore} />
           <ActionButtons onAction={handleAction} disabled={loading} currentRiskScore={riskScore} />
-          <ActivityMetricsDisplay metrics={activityMetrics} />
         </div>
 
         <div className="right-column">
+          <ActivityMetricsDisplay metrics={activityMetrics} />
           <ExplainabilityPanel lastAction={lastAction} />
           <Timeline history={actionHistory} />
         </div>

@@ -13,7 +13,7 @@ import { ActionType, ActionHistoryItem, LastAction, ActivityMetrics } from './ty
 import activityTracker from './activityTracker';
 import './App.css';
 
-type PageType = 'dashboard' | 'hygiene' | 'activity';
+type PageType = 'dashboard' | 'hygiene' | 'activity' | 'history';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('dashboard');
@@ -158,6 +158,13 @@ function App() {
             <BarChart3 size={18} />
             <span>Digital Hygiene Score</span>
           </button>
+          <button 
+            className={`nav-button ${currentPage === 'history' ? 'active' : ''}`}
+            onClick={() => setCurrentPage('history')}
+          >
+            <Activity size={18} />
+            <span>Action History</span>
+          </button>
         </nav>
 
         <button className="reset-button" onClick={handleReset}>
@@ -178,7 +185,6 @@ function App() {
               <ExplainabilityPanel lastAction={lastAction} />
               {personalizedTips && <PersonalizedTips tips={personalizedTips.tips} />}
               {riskBreakdown && <RiskBreakdown data={riskBreakdown} />}
-              <Timeline history={actionHistory} />
             </div>
           </div>
 
@@ -191,6 +197,18 @@ function App() {
           <div className="activity-page">
             <div className="activity-page-content">
               <ActivityMetricsDisplay metrics={activityMetrics} />
+            </div>
+          </div>
+
+          <footer className="app-footer">
+            <p>Educational Platform | Real-Time Risk Analysis Demo</p>
+          </footer>
+        </>
+      ) : currentPage === 'history' ? (
+        <>
+          <div className="history-page">
+            <div className="history-page-content">
+              <Timeline history={actionHistory} />
             </div>
           </div>
 
